@@ -1,20 +1,24 @@
+import java.util.ArrayList;
+
 /*
  * A list of eligible voters used by the CLA.
  */
 public class validList {
-	static Voter[] staticList; //list of eligible voters
-	Voter[] list;
+	static ArrayList<Voter> staticList; //list of eligible voters
+	ArrayList<Voter> list = new ArrayList<>();
 	
 	public validList(){
-		this.list=staticList;
+		list.add(new Voter("Ryan Couch"));
+		list.add(new Voter("Eric Sinke"));
+		staticList=this.list;
 	}
 	
 	
 	
 	//searches through list to see if voter is eligible
 	public boolean isValid(String name){
-		for(int i=0; i<list.length; i++){
-			if(list[i].name.equalsIgnoreCase(name)){
+		for(int i=0; i<list.size(); i++){
+			if(list.get(i).name.equalsIgnoreCase(name)){
 				return true;
 			}
 		}
@@ -24,7 +28,7 @@ public class validList {
 	
 	//initializes validList with voter names for testing
 	void initialize(){
-		
+
 	}
 	
 	

@@ -1,25 +1,30 @@
 import java.security.SecureRandom;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+
+/*
+ * CLA Server class. 
+ */
 public class CLA {
 	
-	/* Example via Tomas Vilda
-	 * public class EchoServer {
-    public static void main(String[] arstring) {
+	//main
+    public static void main(String[] args) {
         try {
             SSLServerSocketFactory sslserversocketfactory =
                     (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
             SSLServerSocket sslserversocket =
-                    (SSLServerSocket) sslserversocketfactory.createServerSocket(9999);
+                    (SSLServerSocket) sslserversocketfactory.createServerSocket(3577);
             SSLSocket sslsocket = (SSLSocket) sslserversocket.accept();
 
             InputStream inputstream = sslsocket.getInputStream();
@@ -27,24 +32,50 @@ public class CLA {
             BufferedReader bufferedreader = new BufferedReader(inputstreamreader);
 
             String string = null;
+            String stringLower = null;
+            String name = null;
+            
             while ((string = bufferedreader.readLine()) != null) {
                 System.out.println(string);
+                stringLower=string.toLowerCase();
+                
+                //if string contains request for validation ID, from Voter
+                if(stringLower.startsWith("request ")){
+                
+                //
+                int index=stringLower.indexOf("request ");
+                name=string.substring(index+8);
+                String ID = requestValidationID(name);
+                if(ID!=null){
+                	System.out.println("Validation #: "+ID);
+                }
+                else{
+                	System.out.println("Error creating validation ID!");
+                }
+              }//end if requesting validation
                 System.out.flush();
             }
         } catch (Exception exception) {
             exception.printStackTrace();
         }
     }
-}
-	 * 
-	 */
 
-	validList list = new validList();
+    
+    
+	 
+    //list of eligible voters
+	static validList list = new validList();
+	
+	//list of validation numbers given out to voters
+	//each entry contains voters name, validationNum, voted
+	static ArrayList<CLAEntry> CLAList = new ArrayList<>();
+	
+	
 	
 	
 	//takes in request from voter seeking validationID
 	//input is name of voter
-	public String requestValidationID(String name){
+	public static String requestValidationID(String name){
 		
 		//confirm voter is on list of eligible voters
 		boolean eligible = list.isValid(name);
@@ -52,10 +83,13 @@ public class CLA {
 		//if eligible, generate voterID
 		if(eligible==true){
 		String voterID = generateValidationID();
+		
+		//add voterID to list of validation numbers given out
+		CLAList.add(new CLAEntry(name, voterID, false));
+		
 		return voterID;
 		}
-		//if ineligible, return null
-		else{
+		else{ //ineligible
 		return null;
 		}
 		
@@ -63,15 +97,22 @@ public class CLA {
 	
 	
 	
+	//sends CLAList to the CTF
+	public void sendCLAList(ArrayList<CLAEntry> CLAList){
+		
+	}
+	
+	
 	
 	//create random validationID
-	
 	//creates ID via UUID
-	public String generateValidationID(){
+	public static String generateValidationID(){
 		UUID id = UUID.randomUUID();
-		System.out.println("UUID: "+id);
+		//System.out.println("UUID: "+id);
 		return String.valueOf(id);
 	}
+	
+	
 	
 	//creates ID via SecureRandom and MessageDigest
 	public String generateValidationSecureID() throws NoSuchAlgorithmException{
