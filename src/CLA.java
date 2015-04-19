@@ -9,8 +9,13 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
 
 /*
@@ -19,23 +24,14 @@ import java.io.InputStreamReader;
 public class CLA {
 	
 	//main
-    public static void main(String[] args) {
-        try {
-            SSLServerSocketFactory sslserversocketfactory =
-                    (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-            SSLServerSocket sslserversocket =
-                    (SSLServerSocket) sslserversocketfactory.createServerSocket(3577);
-            SSLSocket sslsocket = (SSLSocket) sslserversocket.accept();
-
-            InputStream inputstream = sslsocket.getInputStream();
-            InputStreamReader inputstreamreader = new InputStreamReader(inputstream);
-            BufferedReader bufferedreader = new BufferedReader(inputstreamreader);
-
+    public static void main(String[] args) throws IOException {
+    
+    		initializeCLAConnection();
             String string = null;
             String stringLower = null;
             String name = null;
             
-            while ((string = bufferedreader.readLine()) != null) {
+            while ((string = input.readLine()) != null) {
                 System.out.println(string);
                 stringLower=string.toLowerCase();
                 
@@ -55,23 +51,81 @@ public class CLA {
               }//end if requesting validation
                 System.out.flush();
             }
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
+      
     }
 
+
     
-    
-	 
+	static BufferedReader input;
+	static BufferedWriter output;
+	static ObjectOutputStream objectOutput;
+	
     //list of eligible voters
 	static validList list = new validList();
-	
 	//list of validation numbers given out to voters
 	//each entry contains voters name, validationNum, voted
 	static ArrayList<CLAEntry> CLAList = new ArrayList<>();
 	
 	
-	
+	//takes in requests from the stream
+    public void receiveRequest(String input){
+    	
+		
+    }
+    /*
+     * Establishes connection with CTF server
+     */
+    static void connectCTF() throws IOException{
+    	 SSLServerSocketFactory sslserversocketfactory =
+                 (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+         SSLServerSocket sslserversocket =
+                 (SSLServerSocket) sslserversocketfactory.createServerSocket(3578);
+         SSLSocket sslsocket = (SSLSocket) sslserversocket.accept();
+
+         InputStream inputstream = sslsocket.getInputStream();
+         InputStreamReader inputstreamreader = new InputStreamReader(inputstream);
+         BufferedReader bufferedreader = new BufferedReader(inputstreamreader);
+
+         ObjectOutputStream outputstream = (ObjectOutputStream) sslsocket.getOutputStream();
+	     objectOutput=outputstream;
+	     OutputStreamWriter outputstreamwriter = new OutputStreamWriter(outputstream);
+	     BufferedWriter bufferedwriter = new BufferedWriter(outputstreamwriter);
+    }
+
+    
+    
+    static void initializeCLAConnection(){
+    	try {
+            SSLServerSocketFactory sslserversocketfactory =
+                    (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+            SSLServerSocket sslserversocket =
+                    (SSLServerSocket) sslserversocketfactory.createServerSocket(3577);
+            SSLSocket sslsocket = (SSLSocket) sslserversocket.accept();
+
+           
+            InputStream inputstream = sslsocket.getInputStream();
+            InputStreamReader inputstreamreader = new InputStreamReader(inputstream);
+            BufferedReader bufferedreader = new BufferedReader(inputstreamreader);
+
+            
+            /*
+             * 
+             * Need to switch to an objectoutputstream to send list properly
+             */
+            OutputStream outputstream = sslsocket.getOutputStream();
+	        OutputStreamWriter outputstreamwriter = new OutputStreamWriter(outputstream);
+	        BufferedWriter bufferedwriter = new BufferedWriter(outputstreamwriter);
+	        
+	        input=bufferedreader;
+	        output=bufferedwriter;
+   	        System.out.println("Connection accepted from: "+sslserversocket.getInetAddress());
+
+	      //  System.out.println("Successfully established CLA server on SSL port 3577");
+    	} catch (Exception exception) {
+	            exception.printStackTrace();
+	        }
+    }
+    
 	
 	//takes in request from voter seeking validationID
 	//input is name of voter
@@ -99,7 +153,7 @@ public class CLA {
 	
 	//sends CLAList to the CTF
 	public void sendCLAList(ArrayList<CLAEntry> CLAList){
-		
+	//	this.output.w
 	}
 	
 	

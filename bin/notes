@@ -1,0 +1,5 @@
+Sockets
+	Voter -> CLA - 3577
+	Voter -> CTF - 3579
+	CLA -> CTF   - 3578
+	CLA Publish outcome

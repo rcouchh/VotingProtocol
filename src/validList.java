@@ -13,8 +13,6 @@ public class validList {
 		staticList=this.list;
 	}
 	
-	
-	
 	//searches through list to see if voter is eligible
 	public boolean isValid(String name){
 		for(int i=0; i<list.size(); i++){
@@ -24,7 +22,6 @@ public class validList {
 		}
 		return false;
 	}
-	
 	
 	//initializes validList with voter names for testing
 	void initialize(){
