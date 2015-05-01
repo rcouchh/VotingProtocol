@@ -25,7 +25,6 @@ public class CLA {
 	
 	//main
     public static void main(String[] args) throws IOException {
-    
     		initializeCLAConnection();
             String string = null;
             String stringLower = null;
